@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { XMarkIcon, EyeIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
+import { Upload, FileText, Eye, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface PDFFile {
   id: string;
@@ -73,72 +75,85 @@ export default function PDFUploader({ onFilesChange, onFileSelect, selectedPDF, 
     <div className="w-full">
       <div
         {...getRootProps()}
-        className={`p-6 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
-          isDragActive 
-            ? 'border-primary bg-primary/5' 
-            : 'border-border-color hover:border-primary'
-        }`}
+        className={cn(
+          'cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors',
+          isDragActive
+            ? 'border-primary bg-primary/5'
+            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+        )}
       >
         <input {...getInputProps()} />
-        <p className="text-text-secondary">
-          {isDragActive
-            ? 'Drop the PDF files here'
-            : 'Drag and drop PDF files here, or click to select files'}
+        <Upload className="mx-auto mb-3 size-8 text-muted-foreground" />
+        <p className="text-sm font-medium">
+          {isDragActive ? 'Drop the PDF files here' : 'Drop PDFs here or click to browse'}
         </p>
+        <p className="mt-1 text-xs text-muted-foreground">Your files never leave this device</p>
       </div>
 
       {pdfFiles.length > 0 && (
-        <div className="mt-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-medium text-text-primary">Uploaded Files</h3>
-            <p className="text-sm text-text-secondary">Use arrows to reorder files</p>
+        <div className="mt-5">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="text-sm font-medium">Files ({pdfFiles.length})</h3>
+            <p className="text-xs text-muted-foreground">Order sets the merge sequence</p>
           </div>
-          <div className="space-y-2">
+          <ul className="space-y-2">
             {pdfFiles.map((file, index) => (
-              <div
+              <li
                 key={file.id}
-                className={`flex items-center p-3 bg-secondary rounded-lg border transition-colors ${
-                  selectedPDF?.id === file.id 
-                    ? 'border-primary' 
-                    : 'border-border-color hover:border-primary/50'
-                }`}
+                className={cn(
+                  'flex items-center gap-2 rounded-lg border bg-card p-2 pl-1 transition-colors',
+                  selectedPDF?.id === file.id
+                    ? 'border-primary ring-1 ring-primary'
+                    : 'hover:border-primary/40'
+                )}
               >
-                <div className="flex flex-col mr-2">
-                  <button
+                <div className="flex flex-col">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-5"
                     onClick={() => handleMove(index, 'up')}
                     disabled={index === 0}
-                    className="p-1 text-text-secondary hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Move up"
                   >
-                    <ArrowUpIcon className="w-4 h-4" />
-                  </button>
-                  <button
+                    <ChevronUp className="size-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-5"
                     onClick={() => handleMove(index, 'down')}
                     disabled={index === pdfFiles.length - 1}
-                    className="p-1 text-text-secondary hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Move down"
                   >
-                    <ArrowDownIcon className="w-4 h-4" />
-                  </button>
+                    <ChevronDown className="size-3.5" />
+                  </Button>
                 </div>
-                <span className="text-text-primary truncate flex-1">{file.name}</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onFileSelect(file)}
-                    className="p-1 text-text-secondary hover:text-primary transition-colors"
-                  >
-                    <EyeIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleRemove(file.id)}
-                    className="p-1 text-text-secondary hover:text-red-500 transition-colors"
-                  >
-                    <XMarkIcon className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+                <FileText className="size-4 shrink-0 text-muted-foreground" />
+                <span className="min-w-0 flex-1 truncate text-sm">{file.name}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn('size-7', selectedPDF?.id === file.id && 'text-primary')}
+                  onClick={() => onFileSelect(file)}
+                  title="Preview / edit this file"
+                >
+                  <Eye className="size-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 hover:text-destructive"
+                  onClick={() => handleRemove(file.id)}
+                  title="Remove"
+                >
+                  <X className="size-4" />
+                </Button>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
     </div>
   );
-} 
+}

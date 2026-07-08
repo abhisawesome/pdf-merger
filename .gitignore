@@ -20,6 +20,9 @@
 # production
 /build
 
+# pdf.js worker (copied from node_modules by the postinstall script)
+/public/pdf.worker.min.mjs
+
 # misc
 .DS_Store
 *.pem
