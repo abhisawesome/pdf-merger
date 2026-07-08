@@ -31,6 +31,7 @@ import {
   Sparkles,
   ShieldCheck,
   Grip,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPdfDownloadName } from '@/lib/download';
@@ -129,30 +130,47 @@ export default function Home() {
     [editingMerged, selectedPDF]
   );
 
+  const handleClearEditor = useCallback(() => {
+    setEditingMerged(false);
+    setSelectedPDF(null);
+  }, []);
+
   const fileSelector = (
-    <Select
-      value={editingMerged ? '__merged__' : selectedPDF?.id ?? ''}
-      onValueChange={(v) => {
-        if (v === '__merged__') {
-          setEditingMerged(true);
-        } else {
-          setEditingMerged(false);
-          setSelectedPDF(pdfFiles.find((f) => f.id === v) ?? null);
-        }
-      }}
-    >
-      <SelectTrigger size="sm" className="w-44 md:w-64">
-        <SelectValue placeholder="Choose a PDF" />
-      </SelectTrigger>
-      <SelectContent>
-        {pdfFiles.map((f) => (
-          <SelectItem key={f.id} value={f.id}>
-            {f.name}
-          </SelectItem>
-        ))}
-        {mergedPdfData && <SelectItem value="__merged__">Merged PDF</SelectItem>}
-      </SelectContent>
-    </Select>
+    <div className="flex min-w-0 items-center gap-2">
+      <Select
+        value={editingMerged ? '__merged__' : selectedPDF?.id ?? ''}
+        onValueChange={(v) => {
+          if (v === '__merged__') {
+            setEditingMerged(true);
+          } else {
+            setEditingMerged(false);
+            setSelectedPDF(pdfFiles.find((f) => f.id === v) ?? null);
+          }
+        }}
+      >
+        <SelectTrigger size="sm" className="w-44 md:w-64">
+          <SelectValue placeholder="Choose a PDF" />
+        </SelectTrigger>
+        <SelectContent>
+          {pdfFiles.map((f) => (
+            <SelectItem key={f.id} value={f.id}>
+              {f.name}
+            </SelectItem>
+          ))}
+          {mergedPdfData && <SelectItem value="__merged__">Merged PDF</SelectItem>}
+        </SelectContent>
+      </Select>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={handleClearEditor}
+        title="Clear the PDF from the editor"
+      >
+        <X className="size-4" />
+        <span className="hidden sm:inline">Clear</span>
+      </Button>
+    </div>
   );
 
   return (
